@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DOM Traversal</title>
+
+<style>
+body {
+    font-family: Arial;
+    margin: 20px;
+}
+
+.header {
+    border: 2px solid black;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.node {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid black;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.grandparent {
+    background-color: lightblue;
+}
+
+.parent {
+    background-color: lightgreen;
+}
+
+.child {
+    background-color: lightcoral;
+}
+
+.highlight {
+    background-color: yellow !important;
+    border: 3px solid black;
+}
+
+button {
+    margin: 5px;
+    padding: 10px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== PROFILE HEADER ===== -->
+<div class="header">
+    <p>Name: Justin Carl R. Rivero </p>
+    <p>Sex: Male</p>
+    <p>Address: Zone 5, Saripongpong, Lagonoy, Camarines Sur</p>
+    <p>Course/Year/Section: BSIT-2D</p>
+    <p>School: Partido State University</p>
+    <p>Semester & AY: 2nd Sem AY 2025-2026</p>
+    <p>Subject: Event Driven Programming</p>
+    <p>Instructor: Arjay F. Abio</p>
+</div>
+
+<!-- ===== TREE ===== -->
+<div class="node grandparent">
+    Grandparent
+
+    <div class="node parent">
+        Parent 1
+        <div class="node child">Child 1</div>
+        <div class="node child">Child 2</div>
+    </div>
+
+    <div class="node parent">
+        Parent 2
+        <div class="node child">Child 3</div>
+        <div class="node child">Child 4</div>
+    </div>
+</div>
+
+<!-- ===== BUTTONS ===== -->
+<div>
+    <button onclick="down()">Down</button>
+    <button onclick="up()">Up</button>
+    <button onclick="next()">Next</button>
+    <button onclick="prev()">Prev</button>
+    <button onclick="add()">Add Child</button>
+    <button onclick="del()">Delete</button>
+</div>
+
+<script>
+
+let selected = null;
+
+// SELECT NODE
+document.querySelectorAll('.node').forEach(n => {
+    n.addEventListener('click', function(e) {
+        e.stopPropagation();
+
+        if (selected) selected.classList.remove('highlight');
+
+        selected = this;
+        selected.classList.add('highlight');
+    });
+});
+
+// DOWN
+function down() {
+    if (!selected) return;
+    let child = selected.querySelector('.node');
+    if (child) change(child);
+    else alert("No child");
+}
+
+// UP
+function up() {
+    if (!selected) return;
+    let parent = selected.parentElement.closest('.node');
+    if (parent) change(parent);
+    else alert("No parent");
+}
+
+// NEXT
+function next() {
+    if (!selected) return;
+    let n = selected.nextElementSibling;
+    if (n && n.classList.contains('node')) change(n);
+    else alert("No next");
+}
+
+// PREV
+function prev() {
+    if (!selected) return;
+    let p = selected.previousElementSibling;
+    if (p && p.classList.contains('node')) change(p);
+    else alert("No previous");
+}
+
+// ADD
+function add() {
+    if (!selected) return;
+
+    if (selected.classList.contains('grandparent')) {
+        let p = document.createElement('div');
+        p.className = 'node parent';
+        p.textContent = "New Parent";
+
+        let c1 = document.createElement('div');
+        c1.className = 'node child';
+        c1.textContent = "Child";
+
+        let c2 = document.createElement('div');
+        c2.className = 'node child';
+        c2.textContent = "Child";
+
+        p.appendChild(c1);
+        p.appendChild(c2);
+        selected.appendChild(p);
+
+        addClick(p);
+        addClick(c1);
+        addClick(c2);
+
+    } else if (selected.classList.contains('parent')) {
+        let c = document.createElement('div');
+        c.className = 'node child';
+        c.textContent = "New Child";
+
+        selected.appendChild(c);
+        addClick(c);
+
+    } else {
+        alert("Cannot add to child");
+    }
+}
+
+// DELETE
+function del() {
+    if (!selected) return;
+
+    if (selected.classList.contains('grandparent')) {
+        alert("Cannot delete grandparent");
+        return;
+    }
+
+    selected.remove();
+    selected = null;
+}
+
+// CHANGE SELECT
+function change(n) {
+    if (selected) selected.classList.remove('highlight');
+    selected = n;
+    selected.classList.add('highlight');
+}
+
+// ADD EVENT SA NEW NODES
+function addClick(n) {
+    n.addEventListener('click', function(e) {
+        e.stopPropagation();
+
+        if (selected) selected.classList.remove('highlight');
+
+        selected = this;
+        selected.classList.add('highlight');
+    });
+}
+
+</script>
+
+</body>
+</html>
